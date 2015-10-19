@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+<meta charset="utf-8">
 <link href="node_modules/remark-bekk/dist/bekk.css" type="text/css" rel="stylesheet">
 </head>
 <body class="bekk-black">
@@ -25,12 +26,160 @@ class: agenda
 # Agenda
 
 * En liten introduksjonspresentasjon 
-* Utvikling av Site-name
+* (Re)Utvikling av Link Child Foundation website (linkchildfoundation.org)
 
+---
+# Litt historie
+* Enonic 4.7.x
+
+???
+Enonic er et, om ikke veldig populært, veldig mye brukt CMS hos mange av BEKKs kunder. 
+De har tidligere vært notorisk trege med å legge ut nye releaser. 
+Siden mai i år har det kommet i hvertfall 4 nye releaser, hvorav 2 var major relaser.
+
+---
+# Enonic XP 
+
+* Hva er det?
+* Hva er nytt?
+
+---
+# Enonic XP
+
+Teknologistack: 
+
+* Java og (egenutviklet database)^tm i bånn. 
+* Innhold hentes med javascript, med andre ord er datasources eliminert. Nashorn brukes til å gjøre kall mot java-kode fra javascriptet
+* Templating kan utføres med blant annet Thymeleaf, Mustache og Xslt. 
+* Bygges med gradle. 
+
+---
+# Eksempel
+
+```html
+<!-- print-name.html -->
+<h2 data-th-text="${model.name}"></h2>
+```
+
+```javascript
+// controller.js
+module.exports = function(req){
+   var model = {name: "Esben Aarseth"};
+   var view = resolve('print-name.html');
+   return thymeleaf.render(view, model); 
+}
+```
+
+```xml
+<part>
+  <display-name>Print name</display-name>
+  <config />
+</part>
+```
+
+---
+# Konsepter
+
+## "Gamle" konsepter, reskinned
+* Site
+* Content-type
+* Module
+
+## Nye konsepter
+* Page 
+* Part
+* Layout
+* Mixin
 
 ---
 
+# Module
+TODO: Eksempel
 
+???
+Definisjon
+---
+# Site
+
+TODO: Et enkelt xml-eksempel
+
+???
+Definisjon?
+
+---
+# Content-type
+
+Består av en xml fil: MyContentType.xml
+```xml
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<content-type>
+  <display-name>My Content Type</display-name>
+  <!-- Kan gi innholdstypen et custom navn vha script her -->
+  <content-display-name-script></content-display-name-script>
+  <super-type>base:structured</super-type>
+  <!-- Arv (!) -->
+  <is-abstract>false</is-abstract>
+  <is-final>true</is-final>
+  <is-built-in>false</is-built-in>
+  <allow-child-content>true</allow-child-content>
+  <form>
+    Sett inn eksempel på tekstboks
+  </form>
+  <x-data mixin="menu-item"/>
+</content-type>
+```
+
+???
+
+Content-type: I bunn og grunn de gode gamle content-typene, som ikke lengre er konfigurert på site nivå. Det er med andre ord mulig å sjekke inn content-types i repoet. Hurray.
+
+---
+# Page
+
+* page.xml
+* controller.js
+* page.html
+
+???
+Her kommer skeletonet for siden din. Altså head-tags, og en definisjon av regioner som skal være på siden. 
+
+---
+# Part
+
+* part.xml
+* controller.js
+* mypart.html
+
+???
+
+Fungerer litt på samme måte som det de tidligere kalte portlets, uten datasources. En page består gjerne av en eller flere parts. 
+
+---
+# Layout
+
+* layout.xml
+* controller.js
+* mylayout.html
+
+???
+Med layouts kan man legge flere parts ved siden av hverandre. Jeg personlig har kun brukt de til dette i hvertfall, men det er nok mulig å gjøre noe mer smart med dem. I en layout legger man som oftest 2 eller flere parts. Dersom du bare trenger en part, trenger man egentlig ikke noen layout. 
+
+---
+# Mixin
+
+TODO: Legg inn eksempel
+
+???
+
+Mixin: Dersom dere har felles konfigurasjon i flere parts, pages eller layouts, så kan dette røskes ut i en mixin. Fungerer på en lignende måte som mixins som dere kjenner fra less/sass.
+
+---
+class: middle
+
+# Github
+
+* https://github.com/EsbenAarz/enonic-xp-presentation
+* xp.readthedocs.org
 
 </textarea>
 <script src="node_modules/remark-bekk/vendor/remark.min.js" type="text/javascript"></script>
