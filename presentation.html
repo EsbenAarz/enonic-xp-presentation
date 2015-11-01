@@ -29,19 +29,21 @@ class: agenda
 * (Re)Utvikling av Link Child Foundation website (linkchildfoundation.org)
 
 ---
-# Litt historie
-* Enonic 4.7.x
 
-???
-Enonic er et, om ikke veldig populært, veldig mye brukt CMS hos mange av BEKKs kunder. 
-De har tidligere vært notorisk trege med å legge ut nye releaser. 
-Siden mai i år har det kommet i hvertfall 4 nye releaser, hvorav 2 var major relaser.
-
----
 # Enonic XP 
 
 * Hva er det?
 * Hva er nytt?
+
+???
+
+De eldre versjonene av Enonic er et, om ikke veldig populært, veldig mye brukt CMS hos mange av BEKKs kunder. De har tidligere vært notorisk trege med å legge ut nye releaser, og Enonic XP har nå kommet ut ~5 år etter forrige major versjon som et resultat av det.   
+
+På den positive siden, så har de siden mai i år gitt ut i hvertfall 4 releaser. 
+
+Dere kjenner kanskje til Enonic som et CMS. Enonic har gjort store endringer med Enonic XP. XP er først og fremst en infrastruktur, der de kaller CMS'et for "killer-appen" på toppen av infrastrukturen. I platformen deres ligger CMS-et, mulighet for egenutviklede applikasjoner, Elastic Search, etc. I denne workshopen vil vi hovedsaklig jobbe med cms'et, men dersom dere tidlig finner ut at dere vil se på andre konsepter, så kan dere gjerne gjøre dette.  
+
+Så for hva som er nytt, så er det egentlig det meste. Enonic 4.x har vært ute i ca 5 år nå, og de har innsett at det gamle cms'et bare får være det gamle, og begynne bortimot fra scratch. Noen konsepter henger igjen, slik som innholdstyper og sidemaler. Portletter, datakilder, og alt det andre som har irritert i lengre stund har blitt røsket vekk. 
 
 ---
 # Enonic XP
@@ -54,7 +56,7 @@ Teknologistack:
 * Bygges med gradle. 
 
 ---
-# Eksempel
+# Eksempelpart
 
 ```html
 <!-- print-name.html -->
@@ -78,6 +80,11 @@ module.exports = function(req){
 ```
 
 ---
+
+???
+
+Vi skal se litt på rendring av html med thymeleaf i denne workshopen. 
+
 # Konsepter
 
 ## "Gamle" konsepter, reskinned
@@ -97,14 +104,43 @@ module.exports = function(req){
 TODO: Eksempel
 
 ???
-Definisjon
+
+Når man utvikler for enonic-xp har man muligheten til å splitte koden opp i moduler. Per dags dato har jeg ikke fått jobbet så mye med flere moduler samtidig på en site, men jeg regner med dette kan være nyttig for større enterprise-kunder. 
+
+Enonic har planer om å etterhvert komme ut med en slags Enonic App Store, hvor man kan laste ned moduler som man kan plugge inn i siden.
+
 ---
 # Site
 
-TODO: Et enkelt xml-eksempel
+```xml
+<site>
+  <config>
+    <field-set name="info">
+      <label>Info</label>
+      <items>
+        <input type="TextLine" name="ga_tracking_code">
+          <label>Google Analytics Tracking code</label>
+          <occurrences minimum="0" maximum="1"/>
+        </input>
+        <input type="ContentSelector" name="footer_content">
+          <label>Footer links</label>
+          <occurrences minimum="0" maximum="10"/>
+	  <config>
+		<relationship-type>system:reference</relationship-type>
+    		<allow-content-type>system:site</allow-content-type>
+		<allow-content-type>my-module:article</allow-content-type>
+	  </config>
+        </input>
+      </items>
+    </field-set>
+  </config>
+</site>
+```
 
 ???
-Definisjon?
+Konseptet rundt sites er vedlikeholdt i Enonic XP. En ting som er litt greit nå er at man kan sette globale konfigurasjoner og variabler på site-nivå, og la redaktører styre dette dersom ønskelig. 
+
+Variabler man setter på site-nivå er gjerne ting man øsnker skal være tilgjengelig for en page, som vi skal komme tilbake til etterhvert. I dette tilfellet har jeg valgt å definere en Tracking kode for Google Analytics, samt lenker som skal gå inn i en global footer.  
 
 ---
 # Content-type
@@ -131,7 +167,7 @@ Består av en xml fil: MyContentType.xml
 
 ???
 
-Content-type: I bunn og grunn de gode gamle content-typene, som ikke lengre er konfigurert på site nivå. Det er med andre ord mulig å sjekke inn content-types i repoet. Hurray.
+Content-type: I bunn og grunn de gode gamle content-typene, som ikke lengre er konfigurert på serveren. Det er med andre ord mulig å sjekke inn content-types i koden. Det kan også være nevnt å merke at man har muligheten for arv i content-types, noe som kan være greit for å beholde konsistente navn på felter.
 
 ---
 # Page
@@ -141,7 +177,10 @@ Content-type: I bunn og grunn de gode gamle content-typene, som ikke lengre er k
 * page.html
 
 ???
-Her kommer skeletonet for siden din. Altså head-tags, og en definisjon av regioner som skal være på siden. 
+
+Her kommer skeletonet for siden din. Altså typiske head-tags, en definisjon av regioner som skal være på siden. I stad viste jeg en site.xml hvor man kunne legge til lenker som skal gå i en footer. Disse lenkene kan fores inn i page.html, for å skape en global footer. 
+
+Så kan man gjerne spørre seg selv om man virkelig vil være bundet opp av en global footer som skal være lik alle sites. Dersom dette ikke er ønskelig kan man selvsagt alltids lage en part ut av footeren og plassere denne der det er ønskelig.   
 
 ---
 # Part
@@ -162,18 +201,11 @@ Fungerer litt på samme måte som det de tidligere kalte portlets, uten datasour
 * mylayout.html
 
 ???
+
 Med layouts kan man legge flere parts ved siden av hverandre. Jeg personlig har kun brukt de til dette i hvertfall, men det er nok mulig å gjøre noe mer smart med dem. I en layout legger man som oftest 2 eller flere parts. Dersom du bare trenger en part, trenger man egentlig ikke noen layout. 
 
 ---
-# Mixin
 
-TODO: Legg inn eksempel
-
-???
-
-Mixin: Dersom dere har felles konfigurasjon i flere parts, pages eller layouts, så kan dette røskes ut i en mixin. Fungerer på en lignende måte som mixins som dere kjenner fra less/sass.
-
----
 class: middle
 
 # Github
