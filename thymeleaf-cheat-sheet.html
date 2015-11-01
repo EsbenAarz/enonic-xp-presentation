@@ -1,0 +1,44 @@
+<!--
+
+Thymeleaf 101.
+
+Dynamiske verdier som skal komme fra cms'et hentes ut ved hjelp av data-th-* prefixing av verdien man skal ha ut.
+Dersom man skal sette teksten til et element, bruker man data-th-text
+Dersom man skal sette href på en lenke, bruker man data-th-href
+Dersom man skal sette src til et bilde, bruker man data-th-src
+osv.
+
+Det finnes også mulighet til å fore ut html fra et tekstfelt. Da vil man bruke data-th-utext.
+-->
+
+
+
+<!-- Hent ut verdi -->
+<span data-th-text="${fornavn}"></span>
+
+<!-- Input: {fornavn: 'Esben'} -->
+<!-- Output:-->
+<span>Esben</span>
+
+
+<!-- Loop over array -->
+<!-- For å se hva man har tilgang til av verdier innad i en th-each (eksempelvis en counter),
+ se http://www.thymeleaf.org/doc/tutorials/2.1/usingthymeleaf.html#keeping-iteration-status -->
+<div data-th-each="${item: model.items}" data-th-remove="tag"> <!-- data-th-remove="tag" fjerner html-taggen -->
+    <span data-th-text="${item}"></span>
+</div>
+
+<!-- Input: model: {items: ["Esben", "Aarseth"]} -->
+<!-- Output -->
+<span>Esben</span>
+<span>Aarseth</span>
+
+
+<!-- Conditionals -->
+<div data-th-if="${fornavn}" data-th-remove="tag">
+    <span data-th-text="${fornavn}"></span>
+</div>
+
+<!-- Eller -->
+<span data-th-if="${fornavn}" data-th-text="${fornavn}">Placeholder</span>
+
