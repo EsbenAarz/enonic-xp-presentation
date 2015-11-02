@@ -50,7 +50,7 @@ Så for hva som er nytt, så er det egentlig det meste. Enonic 4.x har vært ute
 
 Teknologistack: 
 
-* Java og (egenutviklet database)^tm i bånn. 
+* Java og egenutviklet database for innhold i bånn.
 * Innhold hentes med javascript, med andre ord er datasources eliminert. Nashorn brukes til å gjøre kall mot java-kode fra javascriptet
 * Templating kan utføres med blant annet Thymeleaf, Mustache og Xslt. 
 * Bygges med gradle. 
@@ -135,6 +135,8 @@ Konseptet rundt sites er vedlikeholdt i Enonic XP. En ting som er litt greit nå
 
 Variabler man setter på site-nivå er gjerne ting man øsnker skal være tilgjengelig for en page, som vi skal komme tilbake til etterhvert. I dette tilfellet har jeg valgt å definere en Tracking kode for Google Analytics, samt lenker som skal gå inn i en global footer.  
 
+En litt urelatert ting som kan være greit å bite seg merke i er at dersom man vil unngå tabell-notasjon i javascript, så må dere unngå bindestreker i name-attributtet på input-felt. Det er name-attributtet man henter ut data fra enonic på.
+
 ---
 # Content-type
 
@@ -152,7 +154,10 @@ Består av en xml fil: MyContentType.xml
   <is-built-in>false</is-built-in>
   <allow-child-content>true</allow-child-content>
   <form>
-    Sett inn eksempel på tekstboks
+    <input type="TextLine" name="etternavn">
+      <label>Etternavn</label>
+      <occurrences minimum="0" maximum="1"/>
+    </input>
   </form>
   <x-data mixin="menu-item"/>
 </content-type>
@@ -161,6 +166,7 @@ Består av en xml fil: MyContentType.xml
 ???
 
 Content-type: I bunn og grunn de gode gamle content-typene, som ikke lengre er konfigurert på serveren. Det er med andre ord mulig å sjekke inn content-types i koden. Det kan også være nevnt å merke at man har muligheten for arv i content-types, noe som kan være greit for å beholde konsistente navn på felter.
+
 
 ---
 # Page
@@ -196,12 +202,14 @@ Fungerer litt på samme måte som det de tidligere kalte portlets, uten datasour
 # Layout
 
 * layout.xml
+	- Definerer gjerne hvor mange regioner man vil ha her.
 * controller.js
+	- Gjør kall mot innhold her. 
 * mylayout.html
-
+	- Rendrer htmlen.
 ???
 
-Med layouts kan man legge flere parts ved siden av hverandre. Jeg personlig har kun brukt de til dette i hvertfall, men det er nok mulig å gjøre noe mer smart med dem. I en layout legger man som oftest 2 eller flere parts. Dersom du bare trenger en part, trenger man egentlig ikke noen layout. Tanken til enonic bak layouts kan virke inspirert av grid-systemet til Bootstrap 
+Med layouts kan man eksempelvis legge flere parts ved siden av hverandre. Jeg personlig har kun brukt de til dette i hvertfall, men det er nok mulig å gjøre noe mer smart med dem. I en layout legger man som oftest 2 eller flere parts. Dersom du bare trenger en part, trenger man egentlig ikke noen layout. Tanken til enonic bak layouts kan virke inspirert av grid-systemet til Bootstrap 
 
 ---
 
