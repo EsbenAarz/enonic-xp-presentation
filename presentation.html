@@ -79,8 +79,6 @@ module.exports = function(req){
 </part>
 ```
 
----
-
 ???
 
 Slik ser generelt mappestrukturen ut i Enonic XP. I utgangspunktet er det 3 filer man trenger, med noen få unntak. Man har en html-fil, en javascript-controller, og en xml-fil som inneholder config for det man utvikler. For content-types og mixins trenger man ikke javascript eller html.
@@ -88,6 +86,45 @@ Slik ser generelt mappestrukturen ut i Enonic XP. I utgangspunktet er det 3 file
 I dette eksempelet her bruker vi thymeleaf (vis til cheatsheet) i HTML'en. Controlleren har ansvar for å hente innhold fra Enonic, og man kaller da thymeleaf.render etter å ha bygget opp en modell og resolvet et view. 
 
 Til slutt har vi konfigurasjonen. I konfigurasjonen kan man stappe på det man trenger for å gi liv til modulen. Dette er bare en eksempel-part, så skal vi vise litt mer nærmere etterhvert.  
+
+---
+# Node domain
+
+
+* 'Hjemmesnekra' database
+* Underliggende platform
+	- Innhold lagres som xml-filer på Enonic-instansen.
+	- Nodene har et sett med system-properties som må være tilstede.
+	- Resten av egenskapene til filen defineres av innholdstypen.
+* Brancher
+* Aksepterer følgende data-typer:
+	- String, Geopoint, Boolean, Double, Long, Instant, LocalDateTime, LocalTime, HTMLPart, XML, Reference, BinaryReference, Set. 
+
+???
+
+Enonic XP har som nevnt laget en hjemmesnekra database. Databasen har hentet inspirasjon fra noSQL, Git, ElasticSearch og en rekke andre tjenester. Databasen består i bunn og grunn av XML-filer, som de kaller noder. Disse nodene har et sett med system-properties, mens resten kan defineres på egenhånd. 
+
+I databasen forholder man seg til forskjellige brancher. 
+
+---
+
+# Content domain
+* Enonic XP sitt CMS kommer med en ferdig innholdsdatabase som brukes. 
+* Innholdet ligger i repositoriet cms-repo
+* Man har to forskjellige branches å forholde seg til.
+	* Draft - Ting som ikke er publisert. * Master - Ting som er publisert.
+
+???
+
+cms-repo kommer out of the box.
+
+Man har også forskjellige brancher å forholde seg til når man jobber med cms'et. I CMS'et har man branchene draft og master. I draft ligger ting som er redigert, men ikke er publisert, og i master ligger innhold som er publisert. 
+
+---
+
+# Toolbox/Verktøy/Enonic-instanss
+
+---
 
 # Konsepter
 
@@ -102,27 +139,51 @@ Til slutt har vi konfigurasjonen. I konfigurasjonen kan man stappe på det man t
 * Mixin
 
 ---
+# Mappestruktur
+```
+application-name/
+	- src/main/resources/site/
+		- site.xml
+		- lib/
+		- assets/
+		- parts/
+		- pages/
+			- mypage/
+				- mypage.html
+				- mypage.js
+				- mypage.xml 
+		- layout/
+		- mixins/
+		- view/
+		- content-types/
+		- relationship-types/ 
+		- services/
+```
+???
+
+Enonic XP har en ganske rigid mappestruktur som dere ser.
+
+Det begynner med modul-navnet, etterfulgt av src-mapper før man havner nede i site/. Her begynner ting å skje.
+
+BESKRIV HVER MAPPE
+
+ Vi kommer ikke til å gå gjennom relationship-types, services, og sannsynligvis ikke mixins.
+
+
+
+---
 
 # Site
 
 ```xml
 <site>
   <config>
-    <field-set name="info">
-      <label>Info</label>
+    <field-set name="tracking_info">
+      <label>Tracking</label>
       <items>
         <input type="TextLine" name="ga_tracking_code">
           <label>Google Analytics Tracking code</label>
           <occurrences minimum="0" maximum="1"/>
-        </input>
-        <input type="ContentSelector" name="footer_content">
-          <label>Footer links</label>
-          <occurrences minimum="0" maximum="10"/>
-	  <config>
-		<relationship-type>system:reference</relationship-type>
-    		<allow-content-type>system:site</allow-content-type>
-		<allow-content-type>my-module:article</allow-content-type>
-	  </config>
         </input>
       </items>
     </field-set>
@@ -142,11 +203,8 @@ En litt urelatert ting som kan være greit å bite seg merke i er at dersom man 
 
 Består av en xml fil: MyContentType.xml
 ```xml
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <content-type>
   <display-name>My Content Type</display-name>
-  <!-- Kan gi innholdstypen et custom navn vha script her -->
-  <content-display-name-script></content-display-name-script>
   <super-type>base:structured</super-type>
   <!-- Arv (!) -->
   <is-abstract>false</is-abstract>
@@ -171,11 +229,11 @@ Content-type: I bunn og grunn de gode gamle content-typene, som ikke lengre er k
 ---
 # Page
 
-* page.xml
+* mypage.xml
 	- Definerer regioner og henter ut hvilket innhold som skal vises i de ulike regionene. 
-* controller.js
+* mypage.js
 	- Henter ut det man trenger å outpute i page.html, dersom noe er redaksjonelt styrt. Meta-tagger for eksempel.
-* page.html
+* mypage.html
 	- Inneholder skeleton som er felles for alle sider, ala den gamle page.xsl
 
 ???
@@ -187,9 +245,9 @@ Så kan man gjerne spørre seg selv om man virkelig vil være bundet opp av en g
 ---
 # Part
 
-* part.xml
+* mypart.xml
 	- Definerer konfigurasjon til en part. Man kan f. eks. ha en part som legger på et bilde. Da vil man gjerne lenke til bildet via denne konfigurasjonen.
-* controller.js
+* mypart.js
 	- Henter ut data fra enonic.
 * mypart.html
 	- Outputter data som er gitt fra controlleren.
@@ -201,9 +259,9 @@ Fungerer litt på samme måte som det de tidligere kalte portlets, uten datasour
 ---
 # Layout
 
-* layout.xml
+* mylayout.xml
 	- Definerer gjerne hvor mange regioner man vil ha her.
-* controller.js
+* mylayout.js
 	- Gjør kall mot innhold her. 
 * mylayout.html
 	- Rendrer htmlen.
