@@ -19,6 +19,14 @@ Esben Aarseth og Harald Ringvold
 
 06.11.2015
 
+???
+
+Kort om oss.
+
+Esben: Har vært i BEKK i 1 år. Jobbet med Enonic XP under et "stunt"-prosjekt for Gjensidigestiftelsen i april/mai i år. Dette var på den tiden den eneste siten med unntak av enonic.com som kjørte på Enonic XP.
+
+Harald: [Fyll inn?]
+
 ---
 
 class: agenda
@@ -30,30 +38,39 @@ class: agenda
 
 ---
 
-# Enonic XP 
+# Enonic XP
 
 * Hva er det?
 * Hva er nytt?
 
 ???
 
-De eldre versjonene av Enonic er et, om ikke veldig populært, veldig mye brukt CMS hos mange av BEKKs kunder. De har tidligere vært notorisk trege med å legge ut nye releaser, og Enonic XP har nå kommet ut ~5 år etter forrige major versjon som et resultat av det.   
+De eldre versjonene av Enonic er et, om ikke veldig populært, veldig mye brukt CMS hos mange av BEKKs kunder. De har tidligere vært notorisk trege med å legge ut nye releaser, og Enonic XP har nå kommet ut ~5 år etter forrige major versjon som et resultat av det.
 
-På den positive siden, så har de siden mai i år gitt ut i hvertfall 4 releaser. 
+På den positive siden, så har de siden mai i år gitt ut i hvertfall 4 releaser.
 
-Dere kjenner kanskje til Enonic som et CMS. Enonic har gjort store endringer med Enonic XP. XP er først og fremst en infrastruktur, der de kaller CMS'et for "killer-appen" på toppen av infrastrukturen. I platformen deres ligger CMS-et, mulighet for egenutviklede applikasjoner, Elastic Search, etc. I denne workshopen vil vi hovedsaklig jobbe med cms'et, men dersom dere tidlig finner ut at dere vil se på andre konsepter, så kan dere gjerne gjøre dette.  
+Dere kjenner kanskje til Enonic som et CMS. Enonic har gjort store endringer med Enonic XP. XP er først og fremst en infrastruktur, der de kaller CMS'et for "killer-appen" på toppen av infrastrukturen. I platformen deres ligger CMS-et, mulighet for egenutviklede applikasjoner, Elastic Search, etc. I denne workshopen vil vi hovedsaklig jobbe med cms'et, men dersom dere tidlig finner ut at dere vil se på andre konsepter, så kan dere gjerne gjøre dette.
 
-Så for hva som er nytt, så er det egentlig det meste. Enonic 4.x har vært ute i ca 5 år nå, og de har innsett at det gamle cms'et bare får være det gamle, og begynne bortimot fra scratch. Noen konsepter henger igjen, slik som innholdstyper og sidemaler. Portletter, datakilder, og alt det andre som har irritert i lengre stund har blitt røsket vekk. 
+Så for hva som er nytt, så er det egentlig det meste. Enonic 4.x har vært ute i ca 5 år nå, og de har innsett at det gamle cms'et bare får være det gamle, og begynne bortimot fra scratch. Noen konsepter henger igjen, slik som innholdstyper og sidemaler. Portletter, datakilder, og alt det andre som har irritert i lengre stund har blitt røsket vekk.
 
 ---
 # Enonic XP
 
-Teknologistack: 
+Teknologistack:
 
 * Java og egenutviklet database for innhold i bånn.
-* Innhold hentes med javascript, med andre ord er datasources eliminert. Nashorn brukes til å gjøre kall mot java-kode fra javascriptet
-* Templating kan utføres med blant annet Thymeleaf, Mustache og Xslt. 
-* Bygges med gradle. 
+* Innhold hentes med javascript. Nashorn brukes til å gjøre kall mot java-kode fra javascript.
+* Templating kan utføres med blant annet Thymeleaf, Mustache og Xslt.
+* Bygges med gradle.
+
+
+???
+
+XP er bygget med en egenutviklet database som vi skal se kort over etterpå. Det er skrevet i java, slik at det XP fungerer kryssplatform.
+
+Det dere som utviklere hovedsaklig kommer til å skrive er XML, Javascript og en eller annen form for templatingspråk. For øyeblikket støttes Thymeleaf, Mustache og XSLT. XP bruker nashorn for å bygge en slags bro mellom javascript og java-koden.
+
+En XP-applikasjon bygges med gradle, som pakker all CMS-koden ned i en jar-fil og legger den inn i enonic-instansen.
 
 ---
 # Generell struktur
@@ -68,7 +85,7 @@ Teknologistack:
 module.exports = function(req){
    var model = {name: "Esben Aarseth"};
    var view = resolve('print-name.html');
-   return thymeleaf.render(view, model); 
+   return thymeleaf.render(view, model);
 }
 ```
 
@@ -83,13 +100,13 @@ module.exports = function(req){
 
 Slik ser generelt mappestrukturen ut i Enonic XP. I utgangspunktet er det 3 filer man trenger, med noen få unntak. Man har en html-fil, en javascript-controller, og en xml-fil som inneholder config for det man utvikler. For content-types og mixins trenger man ikke javascript eller html.
 
-I dette eksempelet her bruker vi thymeleaf (vis til cheatsheet) i HTML'en. Controlleren har ansvar for å hente innhold fra Enonic, og man kaller da thymeleaf.render etter å ha bygget opp en modell og resolvet et view. 
+I dette eksempelet her bruker vi thymeleaf i HTML'en. Controlleren har ansvar for å hente innhold fra Enonic, og man kaller da thymeleaf.render etter å ha bygget opp en modell og resolvet et view.
 
-Til slutt har vi konfigurasjonen. I konfigurasjonen kan man stappe på det man trenger for å gi liv til modulen. Dette er bare en eksempel-part, så skal vi vise litt mer nærmere etterhvert.  
+Til slutt har vi konfigurasjonen. I konfigurasjonen kan man stappe på det man trenger for å gi liv til modulen. Dette er bare en eksempel-part, så skal vi vise litt mer nærmere etterhvert.
 
 ---
-# Node domain
 
+# Node domain
 
 * 'Hjemmesnekra' database
 * Underliggende platform
@@ -98,18 +115,18 @@ Til slutt har vi konfigurasjonen. I konfigurasjonen kan man stappe på det man t
 	- Resten av egenskapene til filen defineres av innholdstypen.
 * Brancher
 * Aksepterer følgende data-typer:
-	- String, Geopoint, Boolean, Double, Long, Instant, LocalDateTime, LocalTime, HTMLPart, XML, Reference, BinaryReference, Set. 
+	- String, Geopoint, Boolean, Double, Long, Instant, LocalDateTime, LocalTime, HTMLPart, XML, Reference, BinaryReference, Set.
 
 ???
 
-Enonic XP har som nevnt laget en hjemmesnekra database. Databasen har hentet inspirasjon fra noSQL, Git, ElasticSearch og en rekke andre tjenester. Databasen består i bunn og grunn av XML-filer, som de kaller noder. Disse nodene har et sett med system-properties, mens resten kan defineres på egenhånd. 
+Enonic XP har som nevnt laget en hjemmesnekra database. Databasen har hentet inspirasjon fra noSQL, Git, ElasticSearch og en rekke andre teknologier. Databasen består i bunn og grunn av XML-filer, som de kaller noder. Disse nodene har et sett med system-properties, mens resten kan defineres på egenhånd.
 
-I databasen forholder man seg til forskjellige brancher. 
+I databasen forholder man seg til forskjellige brancher, noe som er nyttig når man redigerer innhold.
 
 ---
 
 # Content domain
-* Enonic XP sitt CMS kommer med en ferdig innholdsdatabase som brukes. 
+* Enonic XP sitt CMS kommer med en ferdig innholdsdatabase som brukes.
 * Innholdet ligger i repositoriet cms-repo
 * Man har to forskjellige branches å forholde seg til.
 	* Draft - Ting som ikke er publisert. * Master - Ting som er publisert.
@@ -118,12 +135,31 @@ I databasen forholder man seg til forskjellige brancher.
 
 cms-repo kommer out of the box.
 
-Man har også forskjellige brancher å forholde seg til når man jobber med cms'et. I CMS'et har man branchene draft og master. I draft ligger ting som er redigert, men ikke er publisert, og i master ligger innhold som er publisert. 
+Man har også forskjellige brancher å forholde seg til når man jobber med cms'et. I CMS'et har man branchene draft og master. I draft ligger ting som er redigert, men ikke er publisert, og i master ligger innhold som er publisert.
 
 ---
 
-# Toolbox/Verktøy/Enonic-instanss
+# XP_INSTALL
 
+* toolbox.sh
+	- dump
+	- export
+	- import
+	- init-app
+	- snapshot
+* server.sh
+* home/deploy/ -> .jar
+* home/repo/ -> Innholdsdatabase
+
+???
+
+I XP_INSTALL-mappen deres finnes det en toolbox-mappe, som inneholder verktøy for blant annet å dumpe alle repositoriene, importere/eksportere innhold, initialisere en enonic-applikasjon og ta snapshot av innholdet.
+
+I bin-mappen i XP_INSTALL finner dere ./server.sh, som brukes til å kjøre opp serveren.
+
+I XP_HOME finner dere en mappe som heter deploy. Når dere kjører gradle deploy er det her .jar-artifakten deres blir lagt.
+
+I repo-mappa på samme sted ligger for øvrig innholds-databasen
 ---
 
 # Konsepter
@@ -131,14 +167,28 @@ Man har også forskjellige brancher å forholde seg til når man jobber med cms'
 ## "Gamle" konsepter, reskinned
 * Site
 * Content-type
+* Page
 
 ## Nye konsepter
-* Page 
 * Part
 * Layout
 * Mixin
+* Services
+
+???
+
+XP har tatt vare på to konsepter, og skrotet det meste andre egentlig. Man har
+fremdeles Site, Content-types og sidemaler. Men nettsidene er ikke lengre bygget opp med portletter, skjulte datakilder og annet ræl.
+I stedet har man fått parts, som erstatter portletter på en ganske bra måte.
+Layouts er et nytt konsept de har innført. Layouts gir mulighet for å legge til flere regioner på en side adhoc, og i disse regionene
+kan man legge til parts.
+
+Services er et forholdsvis nytt konsept som de introduserte i versjon 6. Dette gir utviklere mulighet til å
+lage egne endepunkt for å hente ut innhold asynkront fra klienten.
 
 ---
+
+
 # Mappestruktur
 ```
 application-name/
@@ -151,12 +201,12 @@ application-name/
 			- mypage/
 				- mypage.html
 				- mypage.js
-				- mypage.xml 
+				- mypage.xml
 		- layout/
 		- mixins/
 		- view/
 		- content-types/
-		- relationship-types/ 
+		- relationship-types/
 		- services/
 ```
 ???
@@ -165,12 +215,11 @@ Enonic XP har en ganske rigid mappestruktur som dere ser.
 
 Det begynner med modul-navnet, etterfulgt av src-mapper før man havner nede i site/. Her begynner ting å skje.
 
-BESKRIV HVER MAPPE
+Beskriv hver mappe
 
- Vi kommer ikke til å gå gjennom relationship-types, services, og sannsynligvis ikke mixins.
+lib er klientens javascript, css, og ikoner.
 
-
-
+Vi kommer ikke til å gå gjennom relationship-types, services, og sannsynligvis ikke mixins.
 ---
 
 # Site
@@ -192,11 +241,18 @@ BESKRIV HVER MAPPE
 ```
 
 ???
-Konseptet rundt sites er vedlikeholdt i Enonic XP. En ting som er litt greit nå er at man kan sette globale konfigurasjoner og variabler på site-nivå, og la redaktører styre dette dersom ønskelig. 
+Konseptet rundt sites er vedlikeholdt i Enonic XP. En ting som er litt greit nå er
+at man kan sette globale konfigurasjoner og variabler på site-nivå, og la redaktører
+styre dette dersom ønskelig. Da gjøres dette ved å legge til form-elementer i denne konfigurasjonssiden.
 
-Variabler man setter på site-nivå er gjerne ting man øsnker skal være tilgjengelig for en page, som vi skal komme tilbake til etterhvert. I dette tilfellet har jeg valgt å definere en Tracking kode for Google Analytics, samt lenker som skal gå inn i en global footer.  
 
-En litt urelatert ting som kan være greit å bite seg merke i er at dersom man vil unngå tabell-notasjon i javascript, så må dere unngå bindestreker i name-attributtet på input-felt. Det er name-attributtet man henter ut data fra enonic på.
+Variabler man setter på site-nivå er gjerne ting man ønsker skal være tilgjengelig for en page,
+som vi skal komme tilbake til etterhvert.
+I dette tilfellet har jeg valgt å definere en Tracking kode for Google Analytics, samt lenker som skal gå inn i en global footer.
+
+En litt urelatert ting som kan være greit å bite seg merke i er at dersom man vil
+unngå tabell-notasjon i javascript, så må dere unngå bindestreker i name-attributtet på input-felt.
+Det er name-attributtet man henter ut data fra enonic på.
 
 ---
 # Content-type
@@ -204,33 +260,79 @@ En litt urelatert ting som kan være greit å bite seg merke i er at dersom man 
 Består av en xml fil: MyContentType.xml
 ```xml
 <content-type>
-  <display-name>My Content Type</display-name>
+  <display-name></display-name>
   <super-type>base:structured</super-type>
   <!-- Arv (!) -->
   <is-abstract>false</is-abstract>
   <is-final>true</is-final>
   <is-built-in>false</is-built-in>
   <allow-child-content>true</allow-child-content>
-  <form>
-    <input type="TextLine" name="etternavn">
-      <label>Etternavn</label>
-      <occurrences minimum="0" maximum="1"/>
-    </input>
-  </form>
-  <x-data mixin="menu-item"/>
 </content-type>
 ```
 
 ???
 
-Content-type: I bunn og grunn de gode gamle content-typene, som ikke lengre er konfigurert på serveren. Det er med andre ord mulig å sjekke inn content-types i koden. Det kan også være nevnt å merke at man har muligheten for arv i content-types, noe som kan være greit for å beholde konsistente navn på felter.
+I bunn og grunn de gode gamle content-typene, som ikke lengre er konfigurert på serveren.
+Det er med andre ord mulig å sjekke inn content-types i koden.
+
+I sin enkleste form ser en innholdstype slik ut. Dette er det som man må ha på plass.
+En ting som er bemerkelsesverdig er at man nå har mulighet for arv i innholdstyper.
+Alle innhold må et eller annet tidspunkt arve fra super-type som har base:structured.
+I tillegg har de lagt til mulighet for å "låse ned" en innhodlstype, ved å ikke tillate arv.
+I 99% av tilfellene vil dere ikke trenge dette, men det kan være hendig.
+
+---
+
+# Content-type
+
+Består av en xml fil: MyContentType.xml
+```xml
+<content-type>
+  <display-name>Etternavn</display-name>
+  <super-type>base:structured</super-type>
+  <!-- Arv (!) -->
+  <is-abstract>false</is-abstract>
+  <is-final>true</is-final>
+  <is-built-in>false</is-built-in>
+  <allow-child-content>true</allow-child-content>
+</content-type>
+```
+
+???
+
+Det første man trenger å få på plass er et display name, så i dette tilfelle har jeg valgt å lage
+en innholdstype som bare skal inneholde etternavn.
 
 
 ---
+# Content-type
+
+Består av en xml fil: MyContentType.xml
+```xml
+<content-type>
+  <display-name>Etternavn</display-name>
+  <!-- (...) -->
+  <form>
+    <input type="TextLine" name="etternavn">
+      <label>Etternavn</label>
+      <occurrences minimum="0" maximum="10"/>
+    </input>
+  </form>
+</content-type>
+```
+
+???
+
+Videre kan man legge til et form på innholdstypen, som inneholder det faktiske innholdet.
+Da lager man en form tag, av typen TextLine, med navnet etternavn.
+I tillegg kan man legge til minimum og maksimum antall occurrences et etternavn skal ha.
+
+---
+
 # Page
 
 * mypage.xml
-	- Definerer regioner og henter ut hvilket innhold som skal vises i de ulike regionene. 
+	- Definerer regioner og henter ut hvilket innhold som skal vises i de ulike regionene.
 * mypage.js
 	- Henter ut det man trenger å outpute i page.html, dersom noe er redaksjonelt styrt. Meta-tagger for eksempel.
 * mypage.html
@@ -238,9 +340,9 @@ Content-type: I bunn og grunn de gode gamle content-typene, som ikke lengre er k
 
 ???
 
-Her kommer skeletonet for siden din. Altså typiske head-tags, en definisjon av regioner som skal være på siden. I stad viste jeg en site.xml hvor man kunne legge til lenker som skal gå i en footer. Disse lenkene kan fores inn i page.html, for å skape en global footer. 
+Her kommer skeletonet for siden din. Altså typiske head-tags, en definisjon av regioner som skal være på siden. I stad viste jeg en site.xml hvor man kunne legge til lenker som skal gå i en footer. Disse lenkene kan fores inn i page.html, for å skape en global footer.
 
-Så kan man gjerne spørre seg selv om man virkelig vil være bundet opp av en global footer som skal være lik alle sites. Dersom dette ikke er ønskelig kan man selvsagt alltids lage en part ut av footeren og plassere denne der det er ønskelig.   
+Så kan man gjerne spørre seg selv om man virkelig vil være bundet opp av en global footer som skal være lik alle sites. Dersom dette ikke er ønskelig kan man selvsagt alltids lage en part ut av footeren og plassere denne der det er ønskelig.
 
 ---
 # Part
@@ -254,7 +356,7 @@ Så kan man gjerne spørre seg selv om man virkelig vil være bundet opp av en g
 
 ???
 
-Fungerer litt på samme måte som det de tidligere kalte portlets, uten datasources. En page består gjerne av en eller flere parts. 
+Fungerer litt på samme måte som det de tidligere kalte portlets, uten datasources. En page består gjerne av en eller flere parts.
 
 ---
 # Layout
@@ -262,12 +364,12 @@ Fungerer litt på samme måte som det de tidligere kalte portlets, uten datasour
 * mylayout.xml
 	- Definerer gjerne hvor mange regioner man vil ha her.
 * mylayout.js
-	- Gjør kall mot innhold her. 
+	- Gjør kall mot innhold her.
 * mylayout.html
 	- Rendrer htmlen.
 ???
 
-Med layouts kan man eksempelvis legge flere parts ved siden av hverandre. Jeg personlig har kun brukt de til dette i hvertfall, men det er nok mulig å gjøre noe mer smart med dem. I en layout legger man som oftest 2 eller flere parts. Dersom du bare trenger en part, trenger man egentlig ikke noen layout. Tanken til enonic bak layouts kan virke inspirert av grid-systemet til Bootstrap 
+Med layouts kan man eksempelvis legge flere parts ved siden av hverandre. Jeg personlig har kun brukt de til dette i hvertfall, men det er nok mulig å gjøre noe mer smart med dem. I en layout legger man som oftest 2 eller flere parts. Dersom du bare trenger en part, trenger man egentlig ikke noen layout. Tanken til enonic bak layouts kan virke inspirert av grid-systemet til Bootstrap
 
 ---
 
