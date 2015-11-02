@@ -25,8 +25,8 @@ class: agenda
 
 # Agenda
 
-* En liten introduksjonspresentasjon 
-* (Re)Utvikling av Link Child Foundation website (linkchildfoundation.org)
+* Kjapp gjennomgang av nye konsepter i Enonic XP.
+* HANDS-ON: Utvikling av en liten site.
 
 ---
 
@@ -56,7 +56,7 @@ Teknologistack:
 * Bygges med gradle. 
 
 ---
-# Eksempelpart
+# Generell struktur
 
 ```html
 <!-- print-name.html -->
@@ -83,14 +83,17 @@ module.exports = function(req){
 
 ???
 
-Vi skal se litt på rendring av html med thymeleaf i denne workshopen. 
+Slik ser generelt mappestrukturen ut i Enonic XP. I utgangspunktet er det 3 filer man trenger, med noen få unntak. Man har en html-fil, en javascript-controller, og en xml-fil som inneholder config for det man utvikler. For content-types og mixins trenger man ikke javascript eller html.
+
+I dette eksempelet her bruker vi thymeleaf (vis til cheatsheet) i HTML'en. Controlleren har ansvar for å hente innhold fra Enonic, og man kaller da thymeleaf.render etter å ha bygget opp en modell og resolvet et view. 
+
+Til slutt har vi konfigurasjonen. I konfigurasjonen kan man stappe på det man trenger for å gi liv til modulen. Dette er bare en eksempel-part, så skal vi vise litt mer nærmere etterhvert.  
 
 # Konsepter
 
 ## "Gamle" konsepter, reskinned
 * Site
 * Content-type
-* Module
 
 ## Nye konsepter
 * Page 
@@ -100,16 +103,6 @@ Vi skal se litt på rendring av html med thymeleaf i denne workshopen.
 
 ---
 
-# Module
-TODO: Eksempel
-
-???
-
-Når man utvikler for enonic-xp har man muligheten til å splitte koden opp i moduler. Per dags dato har jeg ikke fått jobbet så mye med flere moduler samtidig på en site, men jeg regner med dette kan være nyttig for større enterprise-kunder. 
-
-Enonic har planer om å etterhvert komme ut med en slags Enonic App Store, hvor man kan laste ned moduler som man kan plugge inn i siden.
-
----
 # Site
 
 ```xml
@@ -173,8 +166,11 @@ Content-type: I bunn og grunn de gode gamle content-typene, som ikke lengre er k
 # Page
 
 * page.xml
+	- Definerer regioner og henter ut hvilket innhold som skal vises i de ulike regionene. 
 * controller.js
+	- Henter ut det man trenger å outpute i page.html, dersom noe er redaksjonelt styrt. Meta-tagger for eksempel.
 * page.html
+	- Inneholder skeleton som er felles for alle sider, ala den gamle page.xsl
 
 ???
 
@@ -186,8 +182,11 @@ Så kan man gjerne spørre seg selv om man virkelig vil være bundet opp av en g
 # Part
 
 * part.xml
+	- Definerer konfigurasjon til en part. Man kan f. eks. ha en part som legger på et bilde. Da vil man gjerne lenke til bildet via denne konfigurasjonen.
 * controller.js
+	- Henter ut data fra enonic.
 * mypart.html
+	- Outputter data som er gitt fra controlleren.
 
 ???
 
@@ -202,7 +201,7 @@ Fungerer litt på samme måte som det de tidligere kalte portlets, uten datasour
 
 ???
 
-Med layouts kan man legge flere parts ved siden av hverandre. Jeg personlig har kun brukt de til dette i hvertfall, men det er nok mulig å gjøre noe mer smart med dem. I en layout legger man som oftest 2 eller flere parts. Dersom du bare trenger en part, trenger man egentlig ikke noen layout. 
+Med layouts kan man legge flere parts ved siden av hverandre. Jeg personlig har kun brukt de til dette i hvertfall, men det er nok mulig å gjøre noe mer smart med dem. I en layout legger man som oftest 2 eller flere parts. Dersom du bare trenger en part, trenger man egentlig ikke noen layout. Tanken til enonic bak layouts kan virke inspirert av grid-systemet til Bootstrap 
 
 ---
 
