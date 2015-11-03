@@ -25,7 +25,7 @@ Kort om oss.
 
 Esben: Har vært i BEKK i 1 år. Jobbet med Enonic XP under et "stunt"-prosjekt for Gjensidigestiftelsen i april/mai i år. Dette var på den tiden den eneste siten med unntak av enonic.com som kjørte på Enonic XP.
 
-Harald: [Fyll inn?]
+Harald: Har vært i BEKK i 2 år. Jobber som teknisk forvalter av Enonic på SVV. Følgt Enonix XP siden det ble annonsert. Har portet en statisk side over til XP som kompetanse bygging.
 
 ---
 
@@ -75,9 +75,11 @@ En XP-applikasjon bygges med gradle, som pakker all CMS-koden ned i en jar-fil o
 ---
 # Generell struktur
 
-```html
-<!-- print-name.html -->
-<h2 data-th-text="${model.name}"></h2>
+```xml
+<part>
+  <display-name>Print name</display-name>
+  <config />
+</part>
 ```
 
 ```javascript
@@ -89,11 +91,9 @@ module.exports = function(req){
 }
 ```
 
-```xml
-<part>
-  <display-name>Print name</display-name>
-  <config />
-</part>
+```html
+<!-- print-name.html -->
+<h2 data-th-text="${model.name}"></h2>
 ```
 
 ???
@@ -106,30 +106,71 @@ Til slutt har vi konfigurasjonen. I konfigurasjonen kan man stappe på det man t
 
 ---
 
+
 # Node domain
 
 * 'Hjemmesnekra' database
 * Underliggende platform
-	- Innhold lagres som xml-filer på Enonic-instansen.
-	- Nodene har et sett med system-properties som må være tilstede.
-	- Resten av egenskapene til filen defineres av innholdstypen.
-* Brancher
-* Aksepterer følgende data-typer:
-	- String, Geopoint, Boolean, Double, Long, Instant, LocalDateTime, LocalTime, HTMLPart, XML, Reference, BinaryReference, Set.
+  - Innhold lagres som xml-filer på Enonic-instansen.
+  - Nodene har et sett med predefinerte attributter som settes av systemet.
+  - Egendefinerte attributter kan legges til noden
+  - Indekseres i embeded ElasticSearch
+  - Schema-løst
+* Tilgjengelige attributt-typer:
+  - String, Geopoint, Boolean, Double, Long, Instant, LocalDateTime, LocalTime, HTMLPart, XML, Reference, BinaryReference, Set.
 
 ???
 
-Enonic XP har som nevnt laget en hjemmesnekra database. Databasen har hentet inspirasjon fra noSQL, Git, ElasticSearch og en rekke andre teknologier. Databasen består i bunn og grunn av XML-filer, som de kaller noder. Disse nodene har et sett med system-properties, mens resten kan defineres på egenhånd.
+Enonic XP har som nevnt laget en hjemmesnekra database. Databasen har hentet inspirasjon fra noSQL, Git, ElasticSearch og en rekke andre teknologier. Databasen består i bunn og grunn av dokumenter som de kaller noder. Disse nodene har et sett med predefinerte systemattributter, mens resten kan defineres på egenhånd.
 
 I databasen forholder man seg til forskjellige brancher, noe som er nyttig når man redigerer innhold.
 
 ---
 
+# Node domain
+
+## Konsepter
+* Nodes
+  - Properties
+* Repository
+  - Node-version
+  - Branches
+* Blobstore
+  - Nodes
+  - Binaries
+
+???
+
+# Nodes
+- Basically et dokument med key/value
+- Attributter som begynner med "_" (_id) er reservert til system-attributter (id, timestamp, permissions)
+- System-properties: _id, _name ovs
+
+# Repository
+- Node-versjon: representasjon av en nodes attributter. Har ikke noe kjennskap til navn, parent eller andre metadata.
+- Branch: Trestruktur basert på nodens og foreldrenodens navn
+  - Peker til en nodeversjon
+  - Når en nodes attributt endres og pushes til en branch opprettes en ny node-versjon og noden i denne branchen peker til den nye node-versjonen.
+
+---
+
 # Content domain
+
+## Konsepter
+
+* Content Manager
+* Content Types
+* Input Types
+* Relationship Types
+
+---
+# Content domain
+* Sett med API og schema som ligger over nodene
 * Enonic XP sitt CMS kommer med en ferdig innholdsdatabase som brukes.
 * Innholdet ligger i repositoriet cms-repo
 * Man har to forskjellige branches å forholde seg til.
-	* Draft - Ting som ikke er publisert. * Master - Ting som er publisert.
+  * Draft - Ting som ikke er publisert.
+  * Master - Ting som er publisert.
 
 ???
 
@@ -217,7 +258,7 @@ Det begynner med modul-navnet, etterfulgt av src-mapper før man havner nede i s
 
 Beskriv hver mappe
 
-lib er klientens javascript, css, og ikoner.
+lib for applikasjonens javascript funksjoner. siste plass `require` js funksjonen sjekker.
 
 Vi kommer ikke til å gå gjennom relationship-types, services, og sannsynligvis ikke mixins.
 ---
@@ -278,8 +319,12 @@ Det er med andre ord mulig å sjekke inn content-types i koden.
 I sin enkleste form ser en innholdstype slik ut. Dette er det som man må ha på plass.
 En ting som er bemerkelsesverdig er at man nå har mulighet for arv i innholdstyper.
 Alle innhold må et eller annet tidspunkt arve fra super-type som har base:structured.
-I tillegg har de lagt til mulighet for å "låse ned" en innhodlstype, ved å ikke tillate arv.
+I tillegg har de lagt til mulighet for å "låse ned" en innholdstype, ved å ikke tillate arv.
 I 99% av tilfellene vil dere ikke trenge dette, men det kan være hendig.
+
+- abstract (default: false) means you cannot create content with this content type
+- final (default: false) means it is not possible to create content types that “extend” this
+- allow-child-content (default: true) if false, it will prevent users from creating child items on content of this type. (i.e. prevents creating child items of images)
 
 ---
 
