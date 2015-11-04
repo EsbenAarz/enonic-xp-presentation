@@ -76,6 +76,7 @@ En XP-applikasjon bygges med gradle, som pakker all CMS-koden ned i en jar-fil o
 # Generell struktur
 
 ```xml
+<!-- print-name.xml -->
 <part>
   <display-name>Print name</display-name>
   <config />
@@ -83,7 +84,7 @@ En XP-applikasjon bygges med gradle, som pakker all CMS-koden ned i en jar-fil o
 ```
 
 ```javascript
-// controller.js
+// print-name.js
 module.exports = function(req){
    var model = {name: "Esben Aarseth"};
    var view = resolve('print-name.html');
@@ -98,11 +99,10 @@ module.exports = function(req){
 
 ???
 
-Slik ser generelt mappestrukturen ut i Enonic XP. I utgangspunktet er det 3 filer man trenger, med noen få unntak. Man har en html-fil, en javascript-controller, og en xml-fil som inneholder config for det man utvikler. For content-types og mixins trenger man ikke javascript eller html.
-
-I dette eksempelet her bruker vi thymeleaf i HTML'en. Controlleren har ansvar for å hente innhold fra Enonic, og man kaller da thymeleaf.render etter å ha bygget opp en modell og resolvet et view.
-
-Til slutt har vi konfigurasjonen. I konfigurasjonen kan man stappe på det man trenger for å gi liv til modulen. Dette er bare en eksempel-part, så skal vi vise litt mer nærmere etterhvert.
+  Slik ser generelt mappestrukturen ut i Enonic XP. I utgangspunktet er det 3 filer man trenger, med noen få unntak. Man har en html-fil, en javascript-controller, og en xml-fil som inneholder config for det man utvikler. For content-types og mixins trenger man ikke javascript eller html.
+  I XML-konfigurasjonen legger man på felter som redaktører kan fylle ut.
+  I Javascriptet henter man ut informasjonen som man trenger, og bygger opp en modell av hvordan siden skal se ut.
+  Deretter resolver man viewet man ønsker å bruke, før man ved hjelp av thymeleaf rendrer disse dataene.
 
 ---
 
