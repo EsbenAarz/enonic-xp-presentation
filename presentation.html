@@ -301,55 +301,19 @@ Det er name-attributtet man henter ut data fra enonic på.
 Består av en xml fil: MyContentType.xml
 ```xml
 <content-type>
-  <display-name></display-name>
-  <super-type>base:structured</super-type>
-  <!-- Arv (!) -->
-  <is-abstract>false</is-abstract>
-  <is-final>true</is-final>
-  <is-built-in>false</is-built-in>
-  <allow-child-content>true</allow-child-content>
-</content-type>
-```
-
-???
-
-I bunn og grunn de gode gamle content-typene, som ikke lengre er konfigurert på serveren.
-Det er med andre ord mulig å sjekke inn content-types i koden.
-
-I sin enkleste form ser en innholdstype slik ut. Dette er det som man må ha på plass.
-En ting som er bemerkelsesverdig er at man nå har mulighet for arv i innholdstyper.
-Alle innhold må et eller annet tidspunkt arve fra super-type som har base:structured.
-I tillegg har de lagt til mulighet for å "låse ned" en innholdstype, ved å ikke tillate arv.
-I 99% av tilfellene vil dere ikke trenge dette, men det kan være hendig.
-
-- abstract (default: false) means you cannot create content with this content type
-- final (default: false) means it is not possible to create content types that “extend” this
-- allow-child-content (default: true) if false, it will prevent users from creating child items on content of this type. (i.e. prevents creating child items of images)
-
----
-
-# Content-type
-
-Består av en xml fil: MyContentType.xml
-```xml
-<content-type>
   <display-name>Etternavn</display-name>
   <super-type>base:structured</super-type>
-  <!-- Arv (!) -->
-  <is-abstract>false</is-abstract>
-  <is-final>true</is-final>
-  <is-built-in>false</is-built-in>
-  <allow-child-content>true</allow-child-content>
 </content-type>
 ```
 
 ???
 
-Det første man trenger å få på plass er et display name, så i dette tilfelle har jeg valgt å lage
-en innholdstype som bare skal inneholde etternavn.
+Content-types  i XP er i bunn og grunn de gode gamle content-typene, med unntak av at de ikke lengre er konfigurert på serveren. I tillegg til dette tillater XP arv i innholdstyper. 
 
+En ting som kan være greit å huske på er at alle innholdstyper må på et eller annet sted i hierarkiet arve fra en type som har base:structured som super-type. 
 
 ---
+
 # Content-type
 
 Består av en xml fil: MyContentType.xml
@@ -364,13 +328,42 @@ Består av en xml fil: MyContentType.xml
     </input>
   </form>
 </content-type>
+
 ```
 
 ???
 
-Videre kan man legge til et form på innholdstypen, som inneholder det faktiske innholdet.
-Da lager man en form tag, av typen TextLine, med navnet etternavn.
+Videre må man legge til et form på innholdstypen, som inneholder felter redaktører kan fylle ut. 
+I dette tilfellet lager vi en form tag, av typen TextLine, med navnet etternavn.
 I tillegg kan man legge til minimum og maksimum antall occurrences et etternavn skal ha.
+
+
+---
+# Content-type
+
+Består av en xml fil: MyContentType.xml
+```xml
+<content-type>
+  <display-name>Etternavn</display-name>
+  <super-type>base:structured</super-type>
+  <!-- (...) -->
+  <is-abstract>false</is-abstract><!-- Optional, default false -->
+  <is-final>false</is-final><!-- Optional, default false -->
+  <allow-child-content>true</allow-child-content><!-- Optional, default true -->
+</content-type>
+```
+
+???
+
+Vi har allerede nevnt at innholdstyper kan inneholde arv. 
+
+Alt innhold må et eller annet tidspunkt arve fra super-type som har base:structured.
+I tillegg har de lagt til mulighet for å "låse ned" en innholdstype, ved å ikke tillate arv.
+I 99% av tilfellene vil dere ikke trenge dette, men det kan være hendig.
+
+- abstract (default: false) means you cannot create content with this content type
+- final (default: false) means it is not possible to create content types that “extend” this
+- allow-child-content (default: true) if false, it will prevent users from creating child items on content of this type. (i.e. prevents creating child items of images)
 
 ---
 
