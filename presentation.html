@@ -375,47 +375,169 @@ I tillegg kan man legge til minimum og maksimum antall occurrences et etternavn 
 ---
 
 # Page
+```xml
+<!-- default.xml -->
+<page>
+  <display-name>Default</display-name>
+  <config />
+  <regions>
+    <region name="main"/>
+    <region name="footer"/>
+  </regions>
+</page>
+```
 
-* mypage.xml
-	- Definerer regioner og henter ut hvilket innhold som skal vises i de ulike regionene.
-* mypage.js
-	- Henter ut det man trenger å outpute i page.html, dersom noe er redaksjonelt styrt. Meta-tagger for eksempel.
-* mypage.html
-	- Inneholder skeleton som er felles for alle sider, ala den gamle page.xsl
+---
 
-???
+# Page
+```javascript
+// default.js
+var thymeleaf = require('/lib/xp/thymeleaf');
+var portal = require('/lib/xp/portal'); // Import the portal functions
 
-Her kommer skeletonet for siden din. Altså typiske head-tags, en definisjon av regioner som skal være på siden. I stad viste jeg en site.xml hvor man kunne legge til lenker som skal gå i en footer. Disse lenkene kan fores inn i page.html, for å skape en global footer.
+exports.get = function(req) {
+  var content = portal.getContent();
+  var mainRegion   = content.page.regions["main"];
+  var footerRegion = content.page.regions["footer"];
+  var model = {
+      mainRegion: mainRegion,
+      footerRegion: footerRegion
+  };
+  return {
+    body: thymeleaf.render(resolve('./default.html'), model);
+  }
+};
 
-Så kan man gjerne spørre seg selv om man virkelig vil være bundet opp av en global footer som skal være lik alle sites. Dersom dette ikke er ønskelig kan man selvsagt alltids lage en part ut av footeren og plassere denne der det er ønskelig.
+```
+---
+
+# Page
+
+```html
+<!--default.html-->
+<html>
+<head>
+</head>
+<body>
+  <main data-portal-component-type="region" data-portal-region="main">
+    <div data-th-each="component : ${mainRegion.components}" data-th-remove="tag">
+      <div data-portal-component="${component.path}" data-th-remove="tag"></div>
+    </div>
+  </main>
+  <footer data-portal-component-type="region" data-portal-region="main">
+    <div data-th-each="component : ${mainRegion.components}" data-th-remove="tag">
+      <div data-portal-component="${component.path}" data-th-remove="tag"></div>
+    </div>
+  </footer>
+</body>
+</html>
+
+```
 
 ---
 # Part
 
-* mypart.xml
-	- Definerer konfigurasjon til en part. Man kan f. eks. ha en part som legger på et bilde. Da vil man gjerne lenke til bildet via denne konfigurasjonen.
-* mypart.js
-	- Henter ut data fra enonic.
-* mypart.html
-	- Outputter data som er gitt fra controlleren.
-
-???
-
-Fungerer litt på samme måte som det de tidligere kalte portlets, uten datasources. En page består gjerne av en eller flere parts.
+```xml
+<!-- favorittlag.xml -->
+<part>
+  <display-name>Favoritt-mennesker</display-name>
+  <config>
+    <field-set name="favorittlag">
+      <label>Favorittlag</label>
+      <items>
+        <input type="TextLine" name="lagnavn">
+          <label>Lagnavn</label>
+          <occurrences minimum="0" maximum="5"/>
+        </input>
+      </items>
+    </field-set>
+  </config>
+</part>
+```
 
 ---
+# Part
+```javascript
+//favorittlag.js
+var portal = require('/lib/xp/portal');
+var thymeleaf = require('/lib/xp/thymeleaf');
+exports.get = function(req) {
+  var component = portal.getComponent();
+  var favorittlag = component.config.favorittlag.lagnavn || [];
+  var view = resolve('./favorittlag.html');
+  return {
+    body: thymeleaf.render(view, {
+      favorittlag: favorittlag
+    });
+  };
+};
+```
+---
+# Part
+```html
+<!-- favorittlag.html -->
+<ul data-th-each="${lag : favorittlag}">
+  <li data-th-text="lag"></li>
+</ul>
+
+```
+---
+
 # Layout
 
-* mylayout.xml
-	- Definerer gjerne hvor mange regioner man vil ha her.
-* mylayout.js
-	- Gjør kall mot innhold her.
-* mylayout.html
-	- Rendrer htmlen.
-???
+```xml
+<layout>
+  <display-name>50/50</display-name>
+  <config/>
+  <regions>
+    <region name="left"/>
+    <region name="right"/>
+  </regions>
+</layout>
+```
+---
 
-Med layouts kan man eksempelvis legge flere parts ved siden av hverandre. Jeg personlig har kun brukt de til dette i hvertfall, men det er nok mulig å gjøre noe mer smart med dem. I en layout legger man som oftest 2 eller flere parts. Dersom du bare trenger en part, trenger man egentlig ikke noen layout. Tanken til enonic bak layouts kan virke inspirert av grid-systemet til Bootstrap
+# Layout
 
+```javascript
+var thymeleaf = require('/lib/xp/thymeleaf');
+var portal = require('/lib/xp/portal'); // Import the portal functions
+
+exports.get = function(req) {
+  var component = portal.getComponent();
+  var model = {
+    component: component
+    leftRegion: component.regions.left,
+    rightRegion: component.regions.right
+  };
+
+  var view = resolve('./four-columns.html');
+
+  return {
+    body: thymeleaf.render(view, params)
+  };
+};
+```
+---
+
+# Layout
+
+```html
+<div data-th-attr="data-portal-component-type=${component.type}" data-th-remove="tag">
+  <div class="row">
+    <div class="col-sm-6" data-portal-region="left">
+      <div data-th-each="component : ${left.components}" data-th-remove="tag">
+        <div data-portal-component="${component.path}" data-th-remove="tag" />
+      </div>
+    </div>
+    <div class="col-sm-6" data-portal-region="left">
+      <div data-th-each="component : ${right.components}" data-th-remove="tag">
+        <div data-portal-component="${component.path}" data-th-remove="tag" />
+      </div>
+    </div>
+  </div>
+</div>
+```
 ---
 
 class: middle
