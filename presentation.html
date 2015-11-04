@@ -45,30 +45,29 @@ class: agenda
 
 ???
 
-De eldre versjonene av Enonic er et, om ikke veldig populært, veldig mye brukt CMS hos mange av BEKKs kunder. De har tidligere vært notorisk trege med å legge ut nye releaser, og Enonic XP har nå kommet ut ~5 år etter forrige major versjon som et resultat av det.
+De eldre versjonene av Enonic er et veldig mye brukt CMS hos mange av BEKKs kunder, til tross for at det ikke har en spesielt høy stjerne hos de fleste utviklere. De har tidligere vært notorisk trege med å legge ut nye releaser, og Enonic XP kom ut i April/mai i år, ca. 5 år etter forrige major versjon. Siden de slapp XP har det kommet ut i hvertfall 4 nye releaser. 
 
-På den positive siden, så har de siden mai i år gitt ut i hvertfall 4 releaser.
+_Forleden dag lanserte de en litt endret nettside hvor de kaller Enonic XP for et Web Operating System_.
 
-Dere kjenner kanskje til Enonic som et CMS. Enonic har gjort store endringer med Enonic XP. XP er først og fremst en infrastruktur, der de kaller CMS'et for "killer-appen" på toppen av infrastrukturen. I platformen deres ligger CMS-et, mulighet for egenutviklede applikasjoner, Elastic Search, etc. I denne workshopen vil vi hovedsaklig jobbe med cms'et, men dersom dere tidlig finner ut at dere vil se på andre konsepter, så kan dere gjerne gjøre dette.
+XP er først og fremst en infrastruktur, der de kaller CMS'et for "killer-appen" på toppen av infrastrukturen. På platformen har man mulighet til å kjøre egenutviklede applikasjoner, Elastic Search, og en del annet snacks. 
 
-Så for hva som er nytt, så er det egentlig det meste. Enonic 4.x har vært ute i ca 5 år nå, og de har innsett at det gamle cms'et bare får være det gamle, og begynne bortimot fra scratch. Noen konsepter henger igjen, slik som innholdstyper og sidemaler. Portletter, datakilder, og alt det andre som har irritert i lengre stund har blitt røsket vekk.
+I denne workshopen vil vi hovedsaklig jobbe med CMS'et.
+
+Så for hva som er nytt, så er det egentlig det meste. Enonic 4.x har vært ute i ca 5 år nå, og de innså til slutt at det gamle CMS'et bare får være det gamle, og begynte bortimot fra scratch. Noen konsepter henger igjen, slik som innholdstyper og sidemaler. Portletter, datakilder, og alt det andre som har irritert i lengre stund har blitt røsket vekk. I tillegg har admin-panelet fått en sårt trengt oppussing, og nå vil jeg faktisk påstå det er litt sexy å jobbe med.
 
 ---
-# Enonic XP
+# Teknologistack
 
-Teknologistack:
-
-* Java og egenutviklet database for innhold i bånn.
-* Innhold hentes med javascript. Nashorn brukes til å gjøre kall mot java-kode fra javascript.
+* Java og egenutviklet NoSQL database for innhold i bånn.
+* Serverside Javascript
 * Templating kan utføres med blant annet Thymeleaf, Mustache og Xslt.
 * Bygges med gradle.
-
 
 ???
 
 XP er bygget med en egenutviklet database som vi skal se kort over etterpå. Det er skrevet i java, slik at det XP fungerer kryssplatform.
 
-Det dere som utviklere hovedsaklig kommer til å skrive er XML, Javascript og en eller annen form for templatingspråk. For øyeblikket støttes Thymeleaf, Mustache og XSLT. XP bruker nashorn for å bygge en slags bro mellom javascript og java-koden.
+Det dere som utviklere hovedsaklig kommer til å skrive er XML, Javascript og en eller annen form for templatingspråk. For øyeblikket støttes Thymeleaf, Mustache og XSLT for templating. I tillegg kan man kalle java-kode fra Javascriptet vha Nashorn-motoren. 
 
 En XP-applikasjon bygges med gradle, som pakker all CMS-koden ned i en jar-fil og legger den inn i enonic-instansen.
 
@@ -76,6 +75,7 @@ En XP-applikasjon bygges med gradle, som pakker all CMS-koden ned i en jar-fil o
 # Generell struktur
 
 ```xml
+<!-- print-name.xml -->
 <part>
   <display-name>Print name</display-name>
   <config />
@@ -83,7 +83,7 @@ En XP-applikasjon bygges med gradle, som pakker all CMS-koden ned i en jar-fil o
 ```
 
 ```javascript
-// controller.js
+// print-name.js
 module.exports = function(req){
    var model = {name: "Esben Aarseth"};
    var view = resolve('print-name.html');
@@ -97,15 +97,13 @@ module.exports = function(req){
 ```
 
 ???
-
-Slik ser generelt mappestrukturen ut i Enonic XP. I utgangspunktet er det 3 filer man trenger, med noen få unntak. Man har en html-fil, en javascript-controller, og en xml-fil som inneholder config for det man utvikler. For content-types og mixins trenger man ikke javascript eller html.
-
-I dette eksempelet her bruker vi thymeleaf i HTML'en. Controlleren har ansvar for å hente innhold fra Enonic, og man kaller da thymeleaf.render etter å ha bygget opp en modell og resolvet et view.
-
-Til slutt har vi konfigurasjonen. I konfigurasjonen kan man stappe på det man trenger for å gi liv til modulen. Dette er bare en eksempel-part, så skal vi vise litt mer nærmere etterhvert.
+  En liten sneakpeak på hvordan filene dine vil være strukturert i en XP-applikasjon:
+  I utgangspunktet er det 3 filer man trenger, med noen få unntak. Man har en html-fil, en javascript-controller, og en xml-fil som inneholder config for det man utvikler. 
+  I XML-konfigurasjonen legger man på felter som redaktører kan fylle ut.
+  I Javascriptet henter man ut informasjonen som man trenger, og bygger opp en modell av hvordan siden skal se ut.
+  Deretter resolver man viewet man ønsker å bruke, før man ved hjelp av thymeleaf rendrer disse dataene.
 
 ---
-
 
 # Node domain
 
@@ -120,6 +118,8 @@ Til slutt har vi konfigurasjonen. I konfigurasjonen kan man stappe på det man t
   - String, Geopoint, Boolean, Double, Long, Instant, LocalDateTime, LocalTime, HTMLPart, XML, Reference, BinaryReference, Set.
 
 ???
+
+Før vi går videre til programmering kan det være greit å få et lite overblikk over databasen som ligger i bånn. 
 
 Enonic XP har som nevnt laget en hjemmesnekra database. Databasen har hentet inspirasjon fra noSQL, Git, ElasticSearch og en rekke andre teknologier. Databasen består i bunn og grunn av dokumenter som de kaller noder. Disse nodene har et sett med predefinerte systemattributter, mens resten kan defineres på egenhånd.
 
@@ -301,55 +301,19 @@ Det er name-attributtet man henter ut data fra enonic på.
 Består av en xml fil: MyContentType.xml
 ```xml
 <content-type>
-  <display-name></display-name>
-  <super-type>base:structured</super-type>
-  <!-- Arv (!) -->
-  <is-abstract>false</is-abstract>
-  <is-final>true</is-final>
-  <is-built-in>false</is-built-in>
-  <allow-child-content>true</allow-child-content>
-</content-type>
-```
-
-???
-
-I bunn og grunn de gode gamle content-typene, som ikke lengre er konfigurert på serveren.
-Det er med andre ord mulig å sjekke inn content-types i koden.
-
-I sin enkleste form ser en innholdstype slik ut. Dette er det som man må ha på plass.
-En ting som er bemerkelsesverdig er at man nå har mulighet for arv i innholdstyper.
-Alle innhold må et eller annet tidspunkt arve fra super-type som har base:structured.
-I tillegg har de lagt til mulighet for å "låse ned" en innholdstype, ved å ikke tillate arv.
-I 99% av tilfellene vil dere ikke trenge dette, men det kan være hendig.
-
-- abstract (default: false) means you cannot create content with this content type
-- final (default: false) means it is not possible to create content types that “extend” this
-- allow-child-content (default: true) if false, it will prevent users from creating child items on content of this type. (i.e. prevents creating child items of images)
-
----
-
-# Content-type
-
-Består av en xml fil: MyContentType.xml
-```xml
-<content-type>
   <display-name>Etternavn</display-name>
   <super-type>base:structured</super-type>
-  <!-- Arv (!) -->
-  <is-abstract>false</is-abstract>
-  <is-final>true</is-final>
-  <is-built-in>false</is-built-in>
-  <allow-child-content>true</allow-child-content>
 </content-type>
 ```
 
 ???
 
-Det første man trenger å få på plass er et display name, så i dette tilfelle har jeg valgt å lage
-en innholdstype som bare skal inneholde etternavn.
+Content-types  i XP er i bunn og grunn de gode gamle content-typene, med unntak av at de ikke lengre er konfigurert på serveren. I tillegg til dette tillater XP arv i innholdstyper. 
 
+En ting som kan være greit å huske på er at alle innholdstyper må på et eller annet sted i hierarkiet arve fra en type som har base:structured som super-type. 
 
 ---
+
 # Content-type
 
 Består av en xml fil: MyContentType.xml
@@ -364,58 +328,209 @@ Består av en xml fil: MyContentType.xml
     </input>
   </form>
 </content-type>
+
 ```
 
 ???
 
-Videre kan man legge til et form på innholdstypen, som inneholder det faktiske innholdet.
-Da lager man en form tag, av typen TextLine, med navnet etternavn.
+Videre må man legge til et form på innholdstypen, som inneholder felter redaktører kan fylle ut. 
+I dette tilfellet lager vi en form tag, av typen TextLine, med navnet etternavn.
 I tillegg kan man legge til minimum og maksimum antall occurrences et etternavn skal ha.
+
+
+---
+# Content-type
+
+Består av en xml fil: MyContentType.xml
+```xml
+<content-type>
+  <display-name>Etternavn</display-name>
+  <super-type>base:structured</super-type>
+  <!-- (...) -->
+  <is-abstract>false</is-abstract><!-- Optional, default false -->
+  <is-final>false</is-final><!-- Optional, default false -->
+  <allow-child-content>true</allow-child-content><!-- Optional, default true -->
+</content-type>
+```
+
+???
+
+Vi har allerede nevnt at innholdstyper kan inneholde arv. 
+
+Alt innhold må et eller annet tidspunkt arve fra super-type som har base:structured.
+I tillegg har de lagt til mulighet for å "låse ned" en innholdstype, ved å ikke tillate arv.
+I 99% av tilfellene vil dere ikke trenge dette, men det kan være hendig.
+
+- abstract (default: false) means you cannot create content with this content type
+- final (default: false) means it is not possible to create content types that “extend” this
+- allow-child-content (default: true) if false, it will prevent users from creating child items on content of this type. (i.e. prevents creating child items of images)
 
 ---
 
 # Page
+```xml
+<!-- default.xml -->
+<page>
+  <display-name>Default</display-name>
+  <config />
+  <regions>
+    <region name="main"/>
+    <region name="footer"/>
+  </regions>
+</page>
+```
 
-* mypage.xml
-	- Definerer regioner og henter ut hvilket innhold som skal vises i de ulike regionene.
-* mypage.js
-	- Henter ut det man trenger å outpute i page.html, dersom noe er redaksjonelt styrt. Meta-tagger for eksempel.
-* mypage.html
-	- Inneholder skeleton som er felles for alle sider, ala den gamle page.xsl
+---
 
-???
+# Page
+```javascript
+// default.js
+var thymeleaf = require('/lib/xp/thymeleaf');
+var portal = require('/lib/xp/portal'); // Import the portal functions
 
-Her kommer skeletonet for siden din. Altså typiske head-tags, en definisjon av regioner som skal være på siden. I stad viste jeg en site.xml hvor man kunne legge til lenker som skal gå i en footer. Disse lenkene kan fores inn i page.html, for å skape en global footer.
+exports.get = function(req) {
+  var content = portal.getContent();
+  var mainRegion   = content.page.regions["main"];
+  var footerRegion = content.page.regions["footer"];
+  var model = {
+      mainRegion: mainRegion,
+      footerRegion: footerRegion
+  };
+  return {
+    body: thymeleaf.render(resolve('./default.html'), model);
+  }
+};
 
-Så kan man gjerne spørre seg selv om man virkelig vil være bundet opp av en global footer som skal være lik alle sites. Dersom dette ikke er ønskelig kan man selvsagt alltids lage en part ut av footeren og plassere denne der det er ønskelig.
+```
+---
+
+# Page
+
+```html
+<!--default.html-->
+<html>
+<head>
+</head>
+<body>
+  <main data-portal-component-type="region" data-portal-region="main">
+    <div data-th-each="component : ${mainRegion.components}" data-th-remove="tag">
+      <div data-portal-component="${component.path}" data-th-remove="tag"></div>
+    </div>
+  </main>
+  <footer data-portal-component-type="region" data-portal-region="footer">
+    <div data-th-each="component : ${footerRegion.components}" data-th-remove="tag">
+      <div data-portal-component="${component.path}" data-th-remove="tag"></div>
+    </div>
+  </footer>
+</body>
+</html>
+
+```
 
 ---
 # Part
 
-* mypart.xml
-	- Definerer konfigurasjon til en part. Man kan f. eks. ha en part som legger på et bilde. Da vil man gjerne lenke til bildet via denne konfigurasjonen.
-* mypart.js
-	- Henter ut data fra enonic.
-* mypart.html
-	- Outputter data som er gitt fra controlleren.
-
-???
-
-Fungerer litt på samme måte som det de tidligere kalte portlets, uten datasources. En page består gjerne av en eller flere parts.
+```xml
+<!-- favorittlag.xml -->
+<part>
+  <display-name>Favoritt-mennesker</display-name>
+  <config>
+    <field-set name="favorittlag">
+      <label>Favorittlag</label>
+      <items>
+        <input type="TextLine" name="lagnavn">
+          <label>Lagnavn</label>
+          <occurrences minimum="0" maximum="5"/>
+        </input>
+      </items>
+    </field-set>
+  </config>
+</part>
+```
 
 ---
+# Part
+```javascript
+//favorittlag.js
+var portal = require('/lib/xp/portal');
+var thymeleaf = require('/lib/xp/thymeleaf');
+exports.get = function(req) {
+  var component = portal.getComponent();
+  var favorittlag = component.config.favorittlag.lagnavn || [];
+  var view = resolve('./favorittlag.html');
+  return {
+    body: thymeleaf.render(view, {
+      favorittlag: favorittlag
+    });
+  };
+};
+```
+---
+# Part
+```html
+<!-- favorittlag.html -->
+<ul data-th-each="${lag : favorittlag}">
+  <li data-th-text="lag"></li>
+</ul>
+
+```
+---
+
 # Layout
 
-* mylayout.xml
-	- Definerer gjerne hvor mange regioner man vil ha her.
-* mylayout.js
-	- Gjør kall mot innhold her.
-* mylayout.html
-	- Rendrer htmlen.
-???
+```xml
+<layout>
+  <display-name>50/50</display-name>
+  <config/>
+  <regions>
+    <region name="left"/>
+    <region name="right"/>
+  </regions>
+</layout>
+```
+---
 
-Med layouts kan man eksempelvis legge flere parts ved siden av hverandre. Jeg personlig har kun brukt de til dette i hvertfall, men det er nok mulig å gjøre noe mer smart med dem. I en layout legger man som oftest 2 eller flere parts. Dersom du bare trenger en part, trenger man egentlig ikke noen layout. Tanken til enonic bak layouts kan virke inspirert av grid-systemet til Bootstrap
+# Layout
 
+```javascript
+var thymeleaf = require('/lib/xp/thymeleaf');
+var portal = require('/lib/xp/portal'); // Import the portal functions
+
+exports.get = function(req) {
+  var component = portal.getComponent();
+  var model = {
+    component: component
+    leftRegion: component.regions.left,
+    rightRegion: component.regions.right
+  };
+
+  var view = resolve('./four-columns.html');
+
+  return {
+    body: thymeleaf.render(view, params)
+  };
+};
+```
+---
+
+# Layout
+
+```html
+<div data-th-attr="data-portal-component-type=${component.type}" data-th-remove="tag">
+  <div class="row">
+    <div class="col-sm-6" data-portal-region="left">
+      <div data-th-each="component : ${left.components}" data-th-remove="tag">
+        <div data-portal-component="${component.path}" data-th-remove="tag" />
+      </div>
+    </div>
+    <div class="col-sm-6" data-portal-region="left">
+      <div data-th-each="component : ${right.components}" data-th-remove="tag">
+        <div data-portal-component="${component.path}" data-th-remove="tag" />
+      </div>
+    </div>
+  </div>
+</div>
+```
 ---
 
 class: middle
