@@ -45,30 +45,29 @@ class: agenda
 
 ???
 
-De eldre versjonene av Enonic er et, om ikke veldig populært, veldig mye brukt CMS hos mange av BEKKs kunder. De har tidligere vært notorisk trege med å legge ut nye releaser, og Enonic XP har nå kommet ut ~5 år etter forrige major versjon som et resultat av det.
+De eldre versjonene av Enonic er et veldig mye brukt CMS hos mange av BEKKs kunder, til tross for at det ikke har en spesielt høy stjerne hos de fleste utviklere. De har tidligere vært notorisk trege med å legge ut nye releaser, og Enonic XP kom ut i April/mai i år, ca. 5 år etter forrige major versjon. Siden de slapp XP har det kommet ut i hvertfall 4 nye releaser. 
 
-På den positive siden, så har de siden mai i år gitt ut i hvertfall 4 releaser.
+_Forleden dag lanserte de en litt endret nettside hvor de kaller Enonic XP for et Web Operating System_.
 
-Dere kjenner kanskje til Enonic som et CMS. Enonic har gjort store endringer med Enonic XP. XP er først og fremst en infrastruktur, der de kaller CMS'et for "killer-appen" på toppen av infrastrukturen. I platformen deres ligger CMS-et, mulighet for egenutviklede applikasjoner, Elastic Search, etc. I denne workshopen vil vi hovedsaklig jobbe med cms'et, men dersom dere tidlig finner ut at dere vil se på andre konsepter, så kan dere gjerne gjøre dette.
+XP er først og fremst en infrastruktur, der de kaller CMS'et for "killer-appen" på toppen av infrastrukturen. På platformen har man mulighet til å kjøre egenutviklede applikasjoner, Elastic Search, og en del annet snacks. 
 
-Så for hva som er nytt, så er det egentlig det meste. Enonic 4.x har vært ute i ca 5 år nå, og de har innsett at det gamle cms'et bare får være det gamle, og begynne bortimot fra scratch. Noen konsepter henger igjen, slik som innholdstyper og sidemaler. Portletter, datakilder, og alt det andre som har irritert i lengre stund har blitt røsket vekk.
+I denne workshopen vil vi hovedsaklig jobbe med CMS'et.
+
+Så for hva som er nytt, så er det egentlig det meste. Enonic 4.x har vært ute i ca 5 år nå, og de innså til slutt at det gamle CMS'et bare får være det gamle, og begynte bortimot fra scratch. Noen konsepter henger igjen, slik som innholdstyper og sidemaler. Portletter, datakilder, og alt det andre som har irritert i lengre stund har blitt røsket vekk. I tillegg har admin-panelet fått en sårt trengt oppussing, og nå vil jeg faktisk påstå det er litt sexy å jobbe med.
 
 ---
-# Enonic XP
+# Teknologistack
 
-Teknologistack:
-
-* Java og egenutviklet database for innhold i bånn.
-* Innhold hentes med javascript. Nashorn brukes til å gjøre kall mot java-kode fra javascript.
+* Java og egenutviklet NoSQL database for innhold i bånn.
+* Serverside Javascript
 * Templating kan utføres med blant annet Thymeleaf, Mustache og Xslt.
 * Bygges med gradle.
-
 
 ???
 
 XP er bygget med en egenutviklet database som vi skal se kort over etterpå. Det er skrevet i java, slik at det XP fungerer kryssplatform.
 
-Det dere som utviklere hovedsaklig kommer til å skrive er XML, Javascript og en eller annen form for templatingspråk. For øyeblikket støttes Thymeleaf, Mustache og XSLT. XP bruker nashorn for å bygge en slags bro mellom javascript og java-koden.
+Det dere som utviklere hovedsaklig kommer til å skrive er XML, Javascript og en eller annen form for templatingspråk. For øyeblikket støttes Thymeleaf, Mustache og XSLT for templating. I tillegg kan man kalle java-kode fra Javascriptet vha Nashorn-motoren. 
 
 En XP-applikasjon bygges med gradle, som pakker all CMS-koden ned i en jar-fil og legger den inn i enonic-instansen.
 
@@ -98,14 +97,13 @@ module.exports = function(req){
 ```
 
 ???
-
-  Slik ser generelt mappestrukturen ut i Enonic XP. I utgangspunktet er det 3 filer man trenger, med noen få unntak. Man har en html-fil, en javascript-controller, og en xml-fil som inneholder config for det man utvikler. For content-types og mixins trenger man ikke javascript eller html.
+  En liten sneakpeak på hvordan filene dine vil være strukturert i en XP-applikasjon:
+  I utgangspunktet er det 3 filer man trenger, med noen få unntak. Man har en html-fil, en javascript-controller, og en xml-fil som inneholder config for det man utvikler. 
   I XML-konfigurasjonen legger man på felter som redaktører kan fylle ut.
   I Javascriptet henter man ut informasjonen som man trenger, og bygger opp en modell av hvordan siden skal se ut.
   Deretter resolver man viewet man ønsker å bruke, før man ved hjelp av thymeleaf rendrer disse dataene.
 
 ---
-
 
 # Node domain
 
@@ -120,6 +118,8 @@ module.exports = function(req){
   - String, Geopoint, Boolean, Double, Long, Instant, LocalDateTime, LocalTime, HTMLPart, XML, Reference, BinaryReference, Set.
 
 ???
+
+Før vi går videre til programmering kan det være greit å få et lite overblikk over databasen som ligger i bånn. 
 
 Enonic XP har som nevnt laget en hjemmesnekra database. Databasen har hentet inspirasjon fra noSQL, Git, ElasticSearch og en rekke andre teknologier. Databasen består i bunn og grunn av dokumenter som de kaller noder. Disse nodene har et sett med predefinerte systemattributter, mens resten kan defineres på egenhånd.
 
